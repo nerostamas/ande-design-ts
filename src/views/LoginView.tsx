@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox, Layout } from 'antd';
+import { Form, Input, Button, Checkbox, Layout, message } from 'antd';
 import { LockTwoTone } from '@ant-design/icons';
 import { login } from '../services/auth.service';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 const { Content, Header } = Layout;
 
@@ -17,14 +18,19 @@ interface IProps {}
 
 interface IState {}
 
-class LoginView extends React.Component<IProps, IState> {
+class LoginView extends React.Component<IProps & RouteComponentProps, IState> {
   onFinish = (values: any) => {
     const { username, password } = values;
-    return login(username, password);
+    return login(username, password).then(() => {
+      message.success('Login success');
+      const { history } = this.props;
+      history.push('/app');
+    });
+    // .catch(err => console.log('login', err));
   };
 
   onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
+    message.error('Invalid username or password');
   };
 
   render() {
@@ -99,4 +105,4 @@ class LoginView extends React.Component<IProps, IState> {
   }
 }
 
-export default LoginView;
+export default withRouter(LoginView);
