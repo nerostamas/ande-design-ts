@@ -9,4 +9,8 @@ const login = (username: string, password: string) => {
     .then(data => console.log(data));
 };
 
-export { login };
+const logout = () => {
+  return axios.post(`/api/auth/logout`);
+};
+
+export { login, logout };
