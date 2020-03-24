@@ -41,7 +41,6 @@ class ErrorBoundary extends React.Component<{}, IState> {
   ) => {
     let _shouldHandleError;
     let _response;
-
     if (
       typeof PromiseRejectionEvent !== 'undefined' &&
       event instanceof PromiseRejectionEvent
@@ -64,47 +63,30 @@ class ErrorBoundary extends React.Component<{}, IState> {
   };
 
   handlePromiseResponseError = response => {
-    if (response.status === 500) {
-      message.error('500: Server error');
+    if (response.status >= 500) {
+      message.error('Server connection error');
       return;
     }
 
-    this.processExpectedServerError(response.data);
+    this.processExpectedServerError(response);
   };
 
   processExpectedServerError = (errorData: any) => {
-    if (errorData && errorData.message) {
-      message.error(errorData.message);
-    }
-  };
-
-  render() {
-    const { error } = this.state;
-    console.log('err', error);
-    console.log(this.props);
-    if (error && error.response) {
-      const { status, data } = error.response;
-      if (status === 401) {
+    if (errorData) {
+      if (errorData.data && errorData.data.message) {
+        message.error(errorData.data.message);
+      } else if (errorData && errorData.status === 401) {
         if (window.location.pathname.includes('/login')) {
           this.setState({ error: undefined });
         } else {
           message.error('401: Permission deny');
           window.location.href = '/login';
         }
-      } else if (status >= 500) {
-        if (window.location.pathname.includes('/login')) {
-          message.error('500: Server connection error');
-          console.log(status);
-          this.setState({ error: undefined });
-        }
-      } else if (data && data.message) {
-        const { error } = this.state;
-        if (error) {
-          message.error(data.message);
-        }
       }
     }
+  };
 
+  render() {
     return this.props.children;
   }
 }

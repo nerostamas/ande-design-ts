@@ -1,9 +1,26 @@
 import React from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { getTicketById } from '../../services/ticket.service';
-import { Row, Col, Form, Button, Input, message } from 'antd';
-import { comment, getCommentByTicket } from '../../services/comment.services';
+import { Row, Col, Form, Button, Input, message, Pagination } from 'antd';
+import {
+  comment,
+  getCommentByTicket,
+  deleteMyComment
+} from '../../services/comment.services';
+import { getAllUser } from '../../services/user.services';
 
+interface IComment {
+  data: {
+    _id: Object;
+    userId: string;
+    ticketId: string;
+    content: string;
+    createTime: number;
+  }[];
+  pages: number;
+  page: number;
+  total: number;
+}
 interface IState {
   ticket: {
     _id: Object;
@@ -12,19 +29,18 @@ interface IState {
     createdBy: string;
     createTime: number;
   };
-  comments: {
+  comments: IComment;
+  userList: {
     _id: Object;
-    userId: String;
-    ticketId: String;
-    content: String;
-    createTime: String;
+    username: string;
   }[];
 }
 
 class TicketDetailView extends React.Component<RouteComponentProps, {}> {
   state = {
     ticket: undefined,
-    comments: []
+    comments: {} as IComment,
+    userList: []
   };
 
   async componentDidMount() {
@@ -32,9 +48,13 @@ class TicketDetailView extends React.Component<RouteComponentProps, {}> {
     if (id) {
       const ticket = await getTicketById(id).then(({ data }) => data);
       const comments = await getCommentByTicket(id).then(({ data }) => data);
+      const userList = await getAllUser().then(({ data }) => data);
+      const userListMap = [];
+      userList.map(item => (userListMap[item._id['$oid']] = { ...item }));
       this.setState({
         ticket,
-        comments
+        comments,
+        userList: userListMap
       });
     }
   }
@@ -49,25 +69,54 @@ class TicketDetailView extends React.Component<RouteComponentProps, {}> {
 
   onFinish = values => {
     const id = this.getTicketId();
-    comment(id, { ...values }).then(({ data }) =>
-      message.success('Comment posted')
+    comment(id, { ...values }).then(({ data }) => {
+      message.success('Comment posted');
+      // const { comments } = this.state;
+      // const updated = [...comments, data];
+      // this.setState({ comments: updated });
+    });
+  };
+
+  onDelete = (commentId: string) => {
+    deleteMyComment(commentId).then(() => message.success('delete success'));
+  };
+
+  onChangePage = (page, pageSize) => {
+    const id = this.getTicketId();
+
+    getCommentByTicket(id, page, pageSize).then(({ data }) =>
+      this.setState({ comments: data })
     );
   };
 
   renderComment = () => {
-    const { comments } = this.state;
-    if (!comments || comments.length === 0) {
+    const { comments, userList } = this.state;
+    console.log(userList);
+    if (!comments || comments.data.length === 0) {
       return <span>No comments</span>;
     }
     return (
       <div>
-        {comments.map(item => (
+        {comments.data.map(item => (
           <div key={item._id['$oid']}>
-            <span>{item.userId}</span>
+            <span style={{ marginRight: 10 }}>
+              <b>{userList[item.userId]?.username}</b>({' '}
+              <span>{new Date(item.createTime).toLocaleDateString()}</span>):
+            </span>
             <span>{item.content}</span>
-            <span>{new Date(item.createTime).toLocaleDateString()}</span>
+            <span
+              style={{ marginLeft: 15, cursor: 'pointer' }}
+              onClick={() => this.onDelete(item._id['$oid'])}
+            >
+              Delete
+            </span>
           </div>
         ))}
+        <Pagination
+          defaultCurrent={1}
+          total={comments.total}
+          onChange={this.onChangePage}
+        />
       </div>
     );
   };

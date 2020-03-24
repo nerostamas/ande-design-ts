@@ -60,7 +60,7 @@ class MenuSider extends React.Component<RouteComponentProps, {}> {
             <Link to='/app/ticket-list'>Ticket List</Link>
           </Menu.Item>
           <Menu.Item key='4'>
-            <Link to='/app/add-ticket'>Add List</Link>
+            <Link to='/app/add-ticket'>Add Ticket</Link>
           </Menu.Item>
         </SubMenu>
       </Menu>

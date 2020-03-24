@@ -4,8 +4,12 @@ const comment = (ticketId: string, { content }: { content: string }) => {
   return Axios.post(`/api/comment/${ticketId}`, { content });
 };
 
-const getCommentByTicket = (ticketId: string) => {
-  return Axios.get(`/api/comment/${ticketId}`);
+const getCommentByTicket = (ticketId: string, page = 1, pageSize = 10) => {
+  return Axios.post(`/api/comment/view/${ticketId}`, { page, pageSize });
 };
 
-export { comment, getCommentByTicket };
+const deleteMyComment = (commentId: string) => {
+  return Axios.delete(`/api/comment/${commentId}`);
+};
+
+export { comment, getCommentByTicket, deleteMyComment };
