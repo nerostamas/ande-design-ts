@@ -7,46 +7,68 @@ import {
 } from '@ant-design/icons';
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { logout } from '../services/auth.service';
+import { getMyInfo } from '../services/user.services';
 
 const { SubMenu } = Menu;
 
-class MenuSider extends React.Component<RouteComponentProps, {}> {
+interface IState {
+  username: string;
+  role: string;
+}
+class MenuSider extends React.Component<{} & RouteComponentProps, {}> {
+  state = {
+    username: '',
+    role: ''
+  };
   requestLogout = () => {
     const { history } = this.props;
     logout().then(() => history.push('/login'));
   };
 
+  componentDidMount() {
+    getMyInfo().then(({ data }) => {
+      this.setState({
+        username: data.username,
+        role: data.role
+      });
+    });
+  }
+
   render() {
+    const { username, role } = this.state;
     return (
       <Menu
         // onClick={this.handleClick}
         style={{ width: 256 }}
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['sub1']}
+        defaultSelectedKeys={['3']}
+        defaultOpenKeys={['sub2']}
         mode='inline'
       >
         <Menu.Item onClick={this.requestLogout}>
           <span>
             <LogoutOutlined />
-            <span>Logout, </span>
+            <span>Logout, {username}</span>
           </span>
         </Menu.Item>
-        <SubMenu
-          key='sub1'
-          title={
-            <span>
-              <UsergroupAddOutlined />
-              <span>Users</span>
-            </span>
-          }
-        >
-          <Menu.Item key='1'>
-            <Link to='/app/user-list'>List all</Link>
-          </Menu.Item>
-          <Menu.Item key='2'>
-            <Link to='/app/add-user'>Add</Link>
-          </Menu.Item>
-        </SubMenu>
+        {['ADMIN', 'SUPPORTER'].includes(role) && (
+          <SubMenu
+            key='sub1'
+            title={
+              <span>
+                <UsergroupAddOutlined />
+                <span>Users</span>
+              </span>
+            }
+          >
+            <Menu.Item key='1'>
+              <Link to='/app/user-list'>List all</Link>
+            </Menu.Item>
+            <Menu.Item key='2'>
+              <Link to='/app/add-user'>Add</Link>
+            </Menu.Item>
+          </SubMenu>
+        )}
+
         <SubMenu
           key='sub2'
           title={

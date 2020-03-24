@@ -53,7 +53,7 @@ class HomePage extends React.Component<RouteComponentProps, {}> {
                 <Route path='/app/ticket/:id'>
                   <TicketDetailView />
                 </Route>
-                <Redirect to='/app/user-list' />
+                <Redirect to='/app/ticket-list' />
               </Switch>
             </Row>
           </Content>

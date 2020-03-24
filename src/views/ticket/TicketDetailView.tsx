@@ -101,7 +101,10 @@ class TicketDetailView extends React.Component<RouteComponentProps, {}> {
           <div key={item._id['$oid']}>
             <span style={{ marginRight: 10 }}>
               <b>{userList[item.userId]?.username}</b>({' '}
-              <span>{new Date(item.createTime).toLocaleDateString()}</span>):
+              <span style={{ paddingRight: 10 }}>
+                {new Date(item.createTime).toLocaleDateString()}
+              </span>
+              <span>{new Date(item.createTime).toLocaleTimeString()}</span>):
             </span>
             <span>{item.content}</span>
             <span

@@ -22,4 +22,8 @@ const getByIds = (ids: string[]) => {
   return axios.post(`/api/users/getByIds`, { ids });
 };
 
-export { createUser, getAllUser, getByIds };
+const getMyInfo = () => {
+  return axios.get(`/api/users/my`);
+};
+
+export { createUser, getAllUser, getByIds, getMyInfo };
