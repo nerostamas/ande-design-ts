@@ -125,11 +125,10 @@ class TicketDetailView extends React.Component<RouteComponentProps, {}> {
   };
 
   render() {
-    const { ticket } = this.state;
+    const { ticket, userList } = this.state;
     if (!ticket) {
       return null;
     }
-    console.log(ticket);
     return (
       <div style={{ width: '100%', padding: 10 }}>
         <Row>
@@ -138,12 +137,12 @@ class TicketDetailView extends React.Component<RouteComponentProps, {}> {
           </Col>
           <Col span={24}>
             <h1>
-              Created By: {new Date(ticket.createTime).toLocaleDateString()} -
+              Time: {new Date(ticket.createTime).toLocaleDateString()} -
               {new Date(ticket.createTime).toLocaleTimeString()}
             </h1>
           </Col>
           <Col span={24}>
-            <h1>Time: {ticket.createTime}</h1>
+            <h1>Created by: {userList[ticket.createdBy]?.username}</h1>
           </Col>
           <Col span={24}>
             <h1>Content: {ticket.content}</h1>
